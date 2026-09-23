@@ -549,39 +549,31 @@
 
   async function checkAdmin(userId) {
 
-    const { data, error } =
-      await supabaseClient
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .maybeSingle();
+  const { data, error } =
+    await supabaseClient.rpc("check_is_admin");
 
+  const adminPanel =
+    document.getElementById("adminPanel");
 
-    const adminPanel =
-      document.getElementById("adminPanel");
+  const userInfo =
+    document.getElementById("userInfo");
 
-    const userInfo =
-      document.getElementById("userInfo");
+  if (!error && data === true) {
 
+    userInfo.innerHTML +=
+      "<br><strong>🛡️ 관리자</strong>";
 
-    if (
-      !error &&
-      data &&
-      data.role === "admin"
-    ) {
+    adminPanel.classList.remove("hidden");
 
-      userInfo.innerHTML +=
-        "<br><strong>🛡️ 관리자</strong>";
+    await loadAdminPosts();
 
-      adminPanel.classList.remove("hidden");
+  } else {
 
-      await loadAdminPosts();
+    adminPanel.classList.add("hidden");
 
-    } else {
-
-      adminPanel.classList.add("hidden");
-    }
+    console.log("관리자 확인 결과:", error, data);
   }
+}
 
 
   /* =========================
