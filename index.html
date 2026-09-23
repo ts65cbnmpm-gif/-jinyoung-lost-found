@@ -81,9 +81,7 @@
       line-height: 1.5;
     }
 
-    /* =========================
-       공개 게시글
-    ========================= */
+    /* 공개 게시글 */
 
     #postList {
       max-height: 520px;
@@ -131,9 +129,7 @@
       white-space: pre-wrap;
     }
 
-    /* =========================
-       뱃지
-    ========================= */
+    /* 뱃지 */
 
     .badge {
       display: inline-block;
@@ -169,9 +165,7 @@
       color: #475569;
     }
 
-    /* =========================
-       입력창
-    ========================= */
+    /* 입력 */
 
     input,
     textarea,
@@ -182,6 +176,7 @@
       border: 1px solid #cbd5e1;
       border-radius: 9px;
       font-size: 14px;
+      font-family: inherit;
     }
 
     input:focus,
@@ -192,9 +187,7 @@
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
     }
 
-    /* =========================
-       버튼
-    ========================= */
+    /* 버튼 */
 
     button {
       background: #2563eb;
@@ -210,6 +203,11 @@
 
     button:hover {
       background: #1d4ed8;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     button.secondary {
@@ -232,9 +230,7 @@
       display: none !important;
     }
 
-    /* =========================
-       관리자
-    ========================= */
+    /* 관리자 */
 
     .admin-post {
       border: 1px solid #bfdbfe;
@@ -264,9 +260,7 @@
       font-size: 13px;
     }
 
-    /* =========================
-       게시글 팝업
-    ========================= */
+    /* 팝업 */
 
     .modal {
       position: fixed;
@@ -327,24 +321,6 @@
       background: #cbd5e1;
     }
 
-    /* =========================
-       스크롤바
-    ========================= */
-
-    #postList::-webkit-scrollbar {
-      width: 7px;
-    }
-
-    #postList::-webkit-scrollbar-thumb {
-      background: #93c5fd;
-      border-radius: 10px;
-    }
-
-    #postList::-webkit-scrollbar-track {
-      background: #eff6ff;
-      border-radius: 10px;
-    }
-
     .empty {
       color: #64748b;
       padding: 20px;
@@ -352,9 +328,7 @@
       grid-column: 1 / -1;
     }
 
-    /* =========================
-       모바일
-    ========================= */
+    /* 모바일 */
 
     @media (max-width: 700px) {
 
@@ -412,7 +386,10 @@
 
   <h1>진영고 분실물 알림</h1>
 
-  <button id="logoutBtn" class="hidden">
+  <button
+    id="logoutBtn"
+    class="hidden"
+  >
     로그아웃
   </button>
 
@@ -449,7 +426,10 @@
       placeholder="예: 검은색 지갑"
     >
 
-    <button onclick="loadPosts()">
+    <button
+      type="button"
+      onclick="loadPosts()"
+    >
       검색
     </button>
 
@@ -489,7 +469,7 @@
     </p>
 
 
-    <label>구분</label>
+    <label for="postType">구분</label>
 
     <select id="postType">
 
@@ -504,16 +484,17 @@
     </select>
 
 
-    <label>제목</label>
+    <label for="postTitle">제목</label>
 
     <input
       id="postTitle"
       type="text"
+      maxlength="100"
       placeholder="예: 검정색 에어팟을 잃어버렸습니다"
     >
 
 
-    <label>학번</label>
+    <label for="studentNumber">학번</label>
 
     <input
       id="studentNumber"
@@ -524,21 +505,22 @@
     >
 
     <p class="notice">
-      학번을 꼭 입력해주세요.
+      학번을 꼭 입력해주세요.<br>
       학번은 관리자만 확인할 수 있습니다.
     </p>
 
 
-    <label>내용</label>
+    <label for="postContent">내용</label>
 
     <textarea
       id="postContent"
       rows="6"
+      maxlength="2000"
       placeholder="잃어버린 장소, 시간, 물건의 특징 등을 적어주세요."
     ></textarea>
 
 
-    <label>사진</label>
+    <label for="postImage">사진</label>
 
     <input
       id="postImage"
@@ -552,7 +534,11 @@
     </p>
 
 
-    <button onclick="submitPost()">
+    <button
+      id="submitPostBtn"
+      type="button"
+      onclick="submitPost()"
+    >
       제보하기
     </button>
 
@@ -579,7 +565,10 @@
         placeholder="비밀번호"
       >
 
-      <button onclick="login()">
+      <button
+        type="button"
+        onclick="login()"
+      >
         로그인
       </button>
 
@@ -609,7 +598,10 @@
       관리자만 볼 수 있는 페이지입니다.
     </p>
 
-    <button onclick="loadAdminPosts()">
+    <button
+      type="button"
+      onclick="loadAdminPosts()"
+    >
       🔄 제보 목록 새로고침
     </button>
 
@@ -626,9 +618,7 @@
 </div>
 
 
-<!-- =========================
-     게시글 팝업
-========================= -->
+<!-- 게시글 팝업 -->
 
 <div
   id="postModal"
@@ -643,6 +633,7 @@
 
     <button
       class="modal-close"
+      type="button"
       onclick="closePostModal()"
     >
       ×
@@ -659,9 +650,9 @@
 
 <script>
 
-  /* =========================
+  /* =====================================================
      Supabase 연결
-  ========================= */
+  ===================================================== */
 
   const SUPABASE_URL =
     "https://wxrkhzwnfyvspfpwaowl.supabase.co";
@@ -676,9 +667,9 @@
     );
 
 
-  /* =========================
-     로그인
-  ========================= */
+  /* =====================================================
+     관리자 로그인
+  ===================================================== */
 
   async function login() {
 
@@ -693,7 +684,6 @@
         .getElementById("password")
         .value;
 
-
     if (!email || !password) {
 
       alert(
@@ -703,24 +693,21 @@
       return;
     }
 
-
     const { error } =
       await supabaseClient.auth.signInWithPassword({
         email,
         password
       });
 
-
     if (error) {
 
       alert(
-        "로그인에 실패했습니다.\n" +
+        "로그인에 실패했습니다.\n\n" +
         error.message
       );
 
       return;
     }
-
 
     alert("로그인되었습니다.");
 
@@ -728,37 +715,45 @@
   }
 
 
-  /* =========================
+  /* =====================================================
      로그아웃
-  ========================= */
+  ===================================================== */
 
   async function logout() {
 
-    await supabaseClient.auth.signOut();
+    const { error } =
+      await supabaseClient.auth.signOut();
 
+    if (error) {
+
+      alert(
+        "로그아웃에 실패했습니다.\n\n" +
+        error.message
+      );
+
+      return;
+    }
 
     document
       .getElementById("adminPanel")
       .classList.add("hidden");
 
-
     await updateLoginState();
-
 
     alert("로그아웃되었습니다.");
   }
 
 
-  /* =========================
-     로그인 상태
-  ========================= */
+  /* =====================================================
+     로그인 상태 확인
+  ===================================================== */
 
   async function updateLoginState() {
 
     const {
       data: { user }
-    } = await supabaseClient.auth.getUser();
-
+    } =
+      await supabaseClient.auth.getUser();
 
     const loginForm =
       document.getElementById("loginForm");
@@ -804,13 +799,16 @@
   }
 
 
-  /* =========================
-     관리자 확인
-  ========================= */
+  /* =====================================================
+     관리자 여부 확인
+  ===================================================== */
 
   async function checkAdmin() {
 
-    const { data, error } =
+    const {
+      data,
+      error
+    } =
       await supabaseClient.rpc(
         "check_is_admin"
       );
@@ -845,9 +843,9 @@
   }
 
 
-  /* =========================
+  /* =====================================================
      사진 업로드
-  ========================= */
+  ===================================================== */
 
   async function uploadImage(file) {
 
@@ -889,7 +887,9 @@
       extension;
 
 
-    const { error } =
+    const {
+      error
+    } =
       await supabaseClient
         .storage
         .from("lost-found-images")
@@ -908,22 +908,34 @@
     }
 
 
-    const { data } =
+    const {
+      data
+    } =
       supabaseClient
         .storage
         .from("lost-found-images")
-        .getPublicUrl(fileName);
+        .getPublicUrl(
+          fileName
+        );
 
 
     return data.publicUrl;
   }
 
 
-  /* =========================
+  /* =====================================================
      제보하기
-  ========================= */
+     
+     게시글 + 학번을 RPC로 한 번에 저장
+  ===================================================== */
 
   async function submitPost() {
+
+    const submitButton =
+      document.getElementById(
+        "submitPostBtn"
+      );
+
 
     const type =
       document
@@ -958,7 +970,13 @@
         .files[0];
 
 
-    if (!title || !studentNumber || !content) {
+    /* 입력 확인 */
+
+    if (
+      !title ||
+      !studentNumber ||
+      !content
+    ) {
 
       alert(
         "제목, 학번, 내용을 모두 입력해주세요."
@@ -968,7 +986,13 @@
     }
 
 
-    if (!/^[0-9]{5}$/.test(studentNumber)) {
+    /* 학번 확인 */
+
+    if (
+      !/^[0-9]{5}$/.test(
+        studentNumber
+      )
+    ) {
 
       alert(
         "학번은 5자리 숫자로 입력해주세요.\n예: 10101"
@@ -977,17 +1001,18 @@
       return;
     }
 
-if (postError) {
-  console.error("posts 저장 오류:", postError);
-  alert("제보에 실패했습니다.\n\n" + postError.message);
-  return;
-}
+
     try {
 
-      const {
-        data: { user }
-      } = await supabaseClient.auth.getUser();
+      /* 버튼 중복 클릭 방지 */
 
+      submitButton.disabled = true;
+
+      submitButton.textContent =
+        "제출 중...";
+
+
+      /* 사진 업로드 */
 
       let imageUrl = null;
 
@@ -999,55 +1024,41 @@ if (postError) {
       }
 
 
-      /* 게시글 생성 */
+      /* 게시글 + 학번 저장 */
 
       const {
-        data: postData,
+        data: postId,
         error
       } =
-        await supabaseClient
-          .from("posts")
-          .insert({
-            type,
-            title,
-            content,
-            author_id: user
-              ? user.id
-              : null,
-            image_url: imageUrl,
-            status: "pending"
-          })
-          .select("id")
-          .single();
+        await supabaseClient.rpc(
+          "submit_lost_found_post",
+          {
+            p_type: type,
+            p_title: title,
+            p_content: content,
+            p_student_number:
+              studentNumber,
+            p_image_url:
+              imageUrl
+          }
+        );
 
 
       if (error) {
+
+        console.error(
+          "제보 저장 오류:",
+          error
+        );
+
         throw error;
       }
 
 
-      /* 학번 저장 */
-
-      const {
-        error: studentError
-      } =
-        await supabaseClient
-          .from("post_student_info")
-          .insert({
-            post_id: postData.id,
-            student_number: studentNumber
-          });
-
-
-      if (studentError) {
-
-        await supabaseClient
-          .from("posts")
-          .delete()
-          .eq("id", postData.id);
-
-        throw studentError;
-      }
+      console.log(
+        "제보 완료:",
+        postId
+      );
 
 
       /* 입력창 초기화 */
@@ -1056,13 +1067,16 @@ if (postError) {
         .getElementById("postTitle")
         .value = "";
 
+
       document
         .getElementById("studentNumber")
         .value = "";
 
+
       document
         .getElementById("postContent")
         .value = "";
+
 
       document
         .getElementById("postImage")
@@ -1075,26 +1089,48 @@ if (postError) {
       );
 
 
+      /* 게시판 새로고침 */
+
+      await loadPosts();
+
+
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "제보 전체 오류:",
+        error
+      );
+
 
       alert(
         "제보에 실패했습니다.\n\n" +
-        error.message
+        (
+          error.message ||
+          "알 수 없는 오류가 발생했습니다."
+        )
       );
+
+
+    } finally {
+
+      submitButton.disabled = false;
+
+      submitButton.textContent =
+        "제보하기";
     }
   }
 
 
-  /* =========================
+  /* =====================================================
      공개 게시글 불러오기
-  ========================= */
+  ===================================================== */
 
   async function loadPosts() {
 
     const postList =
-      document.getElementById("postList");
+      document.getElementById(
+        "postList"
+      );
 
 
     const keyword =
@@ -1110,7 +1146,10 @@ if (postError) {
         .select("*")
         .in(
           "status",
-          ["approved", "resolved"]
+          [
+            "approved",
+            "resolved"
+          ]
         )
         .order(
           "created_at",
@@ -1136,26 +1175,38 @@ if (postError) {
     const {
       data,
       error
-    } = await query;
+    } =
+      await query;
 
 
     if (error) {
 
-      postList.innerHTML =
-        "<p>게시글을 불러오지 못했습니다.</p>";
+      console.error(
+        "게시글 불러오기 오류:",
+        error
+      );
 
-      console.error(error);
+
+      postList.innerHTML =
+        "<div class='empty'>" +
+        "게시글을 불러오지 못했습니다." +
+        "</div>";
+
 
       return;
     }
 
 
-    if (!data || data.length === 0) {
+    if (
+      !data ||
+      data.length === 0
+    ) {
 
       postList.innerHTML =
         "<div class='empty'>" +
         "등록된 게시글이 없습니다." +
         "</div>";
+
 
       return;
     }
@@ -1163,14 +1214,17 @@ if (postError) {
 
     postList.innerHTML =
       data
-        .map(post => renderPost(post))
+        .map(
+          post =>
+            renderPost(post)
+        )
         .join("");
   }
 
 
-  /* =========================
+  /* =====================================================
      공개 게시글 카드
-  ========================= */
+  ===================================================== */
 
   function renderPost(post) {
 
@@ -1194,7 +1248,9 @@ if (postError) {
       post.image_url
         ? `
           <img
-            src="${escapeHtml(post.image_url)}"
+            src="${escapeHtml(
+              post.image_url
+            )}"
             alt="첨부 사진"
           >
         `
@@ -1214,11 +1270,15 @@ if (postError) {
         ${statusBadge}
 
         <h3>
-          ${escapeHtml(post.title)}
+          ${escapeHtml(
+            post.title
+          )}
         </h3>
 
         <p>
-          ${escapeHtml(post.content)}
+          ${escapeHtml(
+            post.content
+          )}
         </p>
 
         ${image}
@@ -1228,24 +1288,31 @@ if (postError) {
   }
 
 
-  /* =========================
-     게시글 팝업 열기
-  ========================= */
+  /* =====================================================
+     게시글 팝업
+  ===================================================== */
 
   async function openPostModal(id) {
 
     const modal =
-      document.getElementById("postModal");
+      document.getElementById(
+        "postModal"
+      );
+
 
     const modalContent =
-      document.getElementById("modalContent");
+      document.getElementById(
+        "modalContent"
+      );
 
 
     modalContent.innerHTML =
       "<p>불러오는 중...</p>";
 
 
-    modal.classList.remove("hidden");
+    modal.classList.remove(
+      "hidden"
+    );
 
 
     const {
@@ -1259,7 +1326,10 @@ if (postError) {
         .single();
 
 
-    if (error || !post) {
+    if (
+      error ||
+      !post
+    ) {
 
       modalContent.innerHTML =
         "<p>게시글을 불러오지 못했습니다.</p>";
@@ -1288,7 +1358,9 @@ if (postError) {
       post.image_url
         ? `
           <img
-            src="${escapeHtml(post.image_url)}"
+            src="${escapeHtml(
+              post.image_url
+            )}"
             alt="첨부 사진"
           >
         `
@@ -1304,53 +1376,65 @@ if (postError) {
       ${statusBadge}
 
       <h2>
-        ${escapeHtml(post.title)}
+        ${escapeHtml(
+          post.title
+        )}
       </h2>
 
       ${image}
 
       <p>
-        ${escapeHtml(post.content)}
+        ${escapeHtml(
+          post.content
+        )}
       </p>
 
       <p class="notice">
         등록일:
-        ${new Date(post.created_at)
-          .toLocaleString("ko-KR")}
+        ${new Date(
+          post.created_at
+        ).toLocaleString("ko-KR")}
       </p>
 
     `;
   }
 
 
-  /* =========================
-     게시글 팝업 닫기
-  ========================= */
+  /* =====================================================
+     팝업 닫기
+  ===================================================== */
 
   function closePostModal(event) {
 
     if (
       event &&
-      event.target !== event.currentTarget
+      event.target !==
+        event.currentTarget
     ) {
       return;
     }
 
 
     document
-      .getElementById("postModal")
-      .classList.add("hidden");
+      .getElementById(
+        "postModal"
+      )
+      .classList.add(
+        "hidden"
+      );
   }
 
 
-  /* =========================
+  /* =====================================================
      관리자 게시글 불러오기
-  ========================= */
+  ===================================================== */
 
   async function loadAdminPosts() {
 
     const adminList =
-      document.getElementById("adminList");
+      document.getElementById(
+        "adminList"
+      );
 
 
     const {
@@ -1378,43 +1462,55 @@ if (postError) {
 
     if (error) {
 
-      adminList.innerHTML =
-        "<p>" +
-        "관리자 글을 불러오지 못했습니다." +
-        "</p>";
+      console.error(
+        "관리자 게시글 오류:",
+        error
+      );
 
-      console.error(error);
+
+      adminList.innerHTML =
+        "<div class='empty'>" +
+        "관리자 글을 불러오지 못했습니다." +
+        "</div>";
+
 
       return;
     }
 
 
-    if (!data || data.length === 0) {
+    if (
+      !data ||
+      data.length === 0
+    ) {
 
       adminList.innerHTML =
         "<div class='empty'>" +
         "등록된 제보가 없습니다." +
         "</div>";
 
+
       return;
     }
 
 
-    /*
-      학번을 한 번에 가져옴.
-      관리자에게만 허용된 SELECT 정책을 사용함.
-    */
+    /* 게시글 ID 가져오기 */
 
     const postIds =
-      data.map(post => post.id);
+      data.map(
+        post => post.id
+      );
 
+
+    /* 학번 가져오기 */
 
     const {
       data: studentData,
       error: studentError
     } =
       await supabaseClient
-        .from("post_student_info")
+        .from(
+          "post_student_info"
+        )
         .select(
           "post_id, student_number"
         )
@@ -1438,30 +1534,35 @@ if (postError) {
 
     if (studentData) {
 
-      studentData.forEach(item => {
+      studentData.forEach(
+        item => {
 
-        studentMap[item.post_id] =
-          item.student_number;
+          studentMap[
+            item.post_id
+          ] =
+            item.student_number;
 
-      });
+        }
+      );
     }
 
 
     adminList.innerHTML =
       data
-        .map(post =>
-          renderAdminPost(
-            post,
-            studentMap[post.id]
-          )
+        .map(
+          post =>
+            renderAdminPost(
+              post,
+              studentMap[post.id]
+            )
         )
         .join("");
   }
 
 
-  /* =========================
+  /* =====================================================
      관리자 게시글 화면
-  ========================= */
+  ===================================================== */
 
   function renderAdminPost(
     post,
@@ -1471,7 +1572,9 @@ if (postError) {
     let statusBadge = "";
 
 
-    if (post.status === "pending") {
+    if (
+      post.status === "pending"
+    ) {
 
       statusBadge = `
         <span class="badge pending">
@@ -1481,7 +1584,9 @@ if (postError) {
     }
 
 
-    if (post.status === "approved") {
+    if (
+      post.status === "approved"
+    ) {
 
       statusBadge = `
         <span class="badge approved">
@@ -1491,7 +1596,9 @@ if (postError) {
     }
 
 
-    if (post.status === "resolved") {
+    if (
+      post.status === "resolved"
+    ) {
 
       statusBadge = `
         <span class="badge resolved">
@@ -1511,7 +1618,9 @@ if (postError) {
       post.image_url
         ? `
           <img
-            src="${escapeHtml(post.image_url)}"
+            src="${escapeHtml(
+              post.image_url
+            )}"
             alt="첨부 사진"
           >
         `
@@ -1527,7 +1636,9 @@ if (postError) {
         <div class="student-number">
           👤 학번:
           <strong>
-            ${escapeHtml(studentNumber)}
+            ${escapeHtml(
+              studentNumber
+            )}
           </strong>
         </div>
       `;
@@ -1539,13 +1650,16 @@ if (postError) {
 
     /* 승인 대기 */
 
-    if (post.status === "pending") {
+    if (
+      post.status === "pending"
+    ) {
 
       actions = `
         <div class="admin-actions">
 
           <button
             class="approve"
+            type="button"
             onclick="changeStatus(
               ${post.id},
               'approved'
@@ -1556,6 +1670,7 @@ if (postError) {
 
           <button
             class="reject"
+            type="button"
             onclick="changeStatus(
               ${post.id},
               'rejected'
@@ -1566,7 +1681,10 @@ if (postError) {
 
           <button
             class="secondary"
-            onclick="deletePost(${post.id})"
+            type="button"
+            onclick="deletePost(
+              ${post.id}
+            )"
           >
             🗑️ 삭제
           </button>
@@ -1578,13 +1696,16 @@ if (postError) {
 
     /* 공개 중 */
 
-    if (post.status === "approved") {
+    if (
+      post.status === "approved"
+    ) {
 
       actions = `
         <div class="admin-actions">
 
           <button
             class="resolve"
+            type="button"
             onclick="changeStatus(
               ${post.id},
               'resolved'
@@ -1595,7 +1716,10 @@ if (postError) {
 
           <button
             class="secondary"
-            onclick="deletePost(${post.id})"
+            type="button"
+            onclick="deletePost(
+              ${post.id}
+            )"
           >
             🗑️ 삭제
           </button>
@@ -1607,14 +1731,19 @@ if (postError) {
 
     /* 처리 완료 */
 
-    if (post.status === "resolved") {
+    if (
+      post.status === "resolved"
+    ) {
 
       actions = `
         <div class="admin-actions">
 
           <button
             class="secondary"
-            onclick="deletePost(${post.id})"
+            type="button"
+            onclick="deletePost(
+              ${post.id}
+            )"
           >
             🗑️ 삭제
           </button>
@@ -1634,13 +1763,17 @@ if (postError) {
         </span>
 
         <h3>
-          ${escapeHtml(post.title)}
+          ${escapeHtml(
+            post.title
+          )}
         </h3>
 
         ${studentInfo}
 
         <p>
-          ${escapeHtml(post.content)}
+          ${escapeHtml(
+            post.content
+          )}
         </p>
 
         ${image}
@@ -1652,9 +1785,9 @@ if (postError) {
   }
 
 
-  /* =========================
-     승인 / 거절 / 완료
-  ========================= */
+  /* =====================================================
+     승인 / 거절 / 처리 완료
+  ===================================================== */
 
   async function changeStatus(
     id,
@@ -1664,28 +1797,36 @@ if (postError) {
     let message = "";
 
 
-    if (status === "approved") {
+    if (
+      status === "approved"
+    ) {
 
       message =
         "이 제보를 승인할까요?";
     }
 
 
-    if (status === "rejected") {
+    if (
+      status === "rejected"
+    ) {
 
       message =
         "이 제보를 거절할까요?";
     }
 
 
-    if (status === "resolved") {
+    if (
+      status === "resolved"
+    ) {
 
       message =
         "이 게시글을 처리 완료로 표시할까요?";
     }
 
 
-    if (!confirm(message)) {
+    if (
+      !confirm(message)
+    ) {
       return;
     }
 
@@ -1696,35 +1837,50 @@ if (postError) {
       await supabaseClient
         .from("posts")
         .update({
-          status
+          status: status
         })
-        .eq("id", id);
+        .eq(
+          "id",
+          id
+        );
 
 
     if (error) {
 
       alert(
-        "처리하지 못했습니다.\n" +
+        "처리하지 못했습니다.\n\n" +
         error.message
       );
+
+      console.error(error);
 
       return;
     }
 
 
-    if (status === "approved") {
+    if (
+      status === "approved"
+    ) {
 
-      alert("승인되었습니다.");
+      alert(
+        "승인되었습니다."
+      );
     }
 
 
-    if (status === "rejected") {
+    if (
+      status === "rejected"
+    ) {
 
-      alert("거절되었습니다.");
+      alert(
+        "거절되었습니다."
+      );
     }
 
 
-    if (status === "resolved") {
+    if (
+      status === "resolved"
+    ) {
 
       alert(
         "처리 완료로 표시되었습니다."
@@ -1738,9 +1894,9 @@ if (postError) {
   }
 
 
-  /* =========================
+  /* =====================================================
      삭제
-  ========================= */
+  ===================================================== */
 
   async function deletePost(id) {
 
@@ -1759,21 +1915,28 @@ if (postError) {
       await supabaseClient
         .from("posts")
         .delete()
-        .eq("id", id);
+        .eq(
+          "id",
+          id
+        );
 
 
     if (error) {
 
       alert(
-        "삭제하지 못했습니다.\n" +
+        "삭제하지 못했습니다.\n\n" +
         error.message
       );
+
+      console.error(error);
 
       return;
     }
 
 
-    alert("삭제되었습니다.");
+    alert(
+      "삭제되었습니다."
+    );
 
 
     await loadAdminPosts();
@@ -1782,13 +1945,16 @@ if (postError) {
   }
 
 
-  /* =========================
+  /* =====================================================
      HTML 안전 처리
-  ========================= */
+  ===================================================== */
 
   function escapeHtml(value) {
 
-    if (!value) {
+    if (
+      value === null ||
+      value === undefined
+    ) {
       return "";
     }
 
@@ -1817,24 +1983,36 @@ if (postError) {
   }
 
 
-  /* =========================
-     시작
-  ========================= */
+  /* =====================================================
+     로그아웃 버튼
+  ===================================================== */
 
   document
-    .getElementById("logoutBtn")
+    .getElementById(
+      "logoutBtn"
+    )
     .addEventListener(
       "click",
       logout
     );
 
 
+  /* =====================================================
+     로그인 상태 변화
+  ===================================================== */
+
   supabaseClient.auth.onAuthStateChange(
     () => {
+
       updateLoginState();
+
     }
   );
 
+
+  /* =====================================================
+     페이지 시작
+  ===================================================== */
 
   updateLoginState();
 
