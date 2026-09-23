@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>진영고 분실물 알림</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,11 +22,14 @@
 
     header {
       background: white;
-      padding: 18px 20px;
       border-bottom: 1px solid #ddd;
+      padding: 18px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     header h1 {
@@ -34,17 +38,17 @@
     }
 
     .container {
-      max-width: 900px;
-      margin: 35px auto;
+      max-width: 1000px;
+      margin: 30px auto;
       padding: 20px;
     }
 
     .hero {
       background: white;
-      padding: 40px 25px;
+      padding: 45px 25px;
       border-radius: 20px;
       text-align: center;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      box-shadow: 0 5px 20px rgba(0,0,0,.05);
     }
 
     .hero h2 {
@@ -56,25 +60,39 @@
       color: #666;
     }
 
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin: 25px 0 15px;
+    }
+
+    .tabs button {
+      flex: 1;
+    }
+
     .cards {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 15px;
-      margin-top: 25px;
+    }
+
+    .card,
+    .box {
+      background: white;
+      padding: 24px;
+      border-radius: 15px;
+      border: 1px solid #eee;
+      margin-top: 20px;
     }
 
     .card {
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
       text-align: center;
-      border: 1px solid #eee;
     }
 
     button {
       border: none;
-      border-radius: 10px;
-      padding: 12px 18px;
+      border-radius: 9px;
+      padding: 11px 16px;
       cursor: pointer;
       background: #222;
       color: white;
@@ -82,16 +100,19 @@
     }
 
     button:hover {
-      opacity: 0.85;
+      opacity: .85;
     }
 
-    .login-box,
-    .report-box {
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-      margin-top: 25px;
-      border: 1px solid #eee;
+    button.secondary {
+      background: #777;
+    }
+
+    button.approve {
+      background: #2e7d32;
+    }
+
+    button.reject {
+      background: #c62828;
     }
 
     input,
@@ -99,7 +120,7 @@
     textarea {
       width: 100%;
       padding: 12px;
-      margin: 7px 0;
+      margin: 6px 0 12px;
       border: 1px solid #ddd;
       border-radius: 8px;
       font-size: 14px;
@@ -111,27 +132,95 @@
     }
 
     label {
-      display: block;
-      margin-top: 12px;
       font-weight: bold;
     }
 
-    #userInfo {
-      margin-top: 15px;
+    .hidden {
+      display: none !important;
+    }
+
+    .user-info {
+      margin-top: 12px;
       padding: 12px;
       background: #f1f3f5;
       border-radius: 10px;
-      display: none;
-    }
-
-    .hidden {
-      display: none;
     }
 
     .notice {
       color: #666;
       font-size: 13px;
+    }
+
+    .post {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 12px 0;
+    }
+
+    .post img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      border-radius: 10px;
       margin-top: 10px;
+      background: #eee;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      background: #eee;
+      margin-bottom: 8px;
+    }
+
+    .badge.lost {
+      background: #ffe0e0;
+    }
+
+    .badge.found {
+      background: #e0f0ff;
+    }
+
+    .badge.pending {
+      background: #fff0c2;
+    }
+
+    .badge.approved {
+      background: #dff5df;
+    }
+
+    .badge.rejected {
+      background: #ffdede;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .search-row input {
+      margin: 0;
+    }
+
+    .search-row button {
+      white-space: nowrap;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777;
+      padding: 30px 10px;
     }
 
     @media (max-width: 700px) {
@@ -142,6 +231,10 @@
       .hero h2 {
         font-size: 25px;
       }
+
+      .search-row {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -150,105 +243,182 @@
 
 <header>
   <h1>진영고 분실물 알림</h1>
-  <button id="logoutBtn" class="hidden">로그아웃</button>
+
+  <button id="logoutBtn" class="hidden">
+    로그아웃
+  </button>
 </header>
+
 
 <div class="container">
 
-  <div class="hero">
+  <!-- 메인 -->
+  <section class="hero">
     <h2>잃어버린 물건,<br>여기서 찾아보세요.</h2>
-    <p>진영고 학생들을 위한 분실물·습득물 알림 사이트입니다.</p>
-  </div>
 
-  <div class="cards">
+    <p>
+      진영고 학생들을 위한 분실물·습득물 알림 사이트입니다.
+    </p>
+  </section>
 
-    <div class="card">
-      <h3>🔎 분실물 찾기</h3>
-      <p>잃어버린 물건을 확인할 수 있습니다.</p>
-      <button onclick="alert('분실물 목록은 다음 단계에서 연결됩니다.')">
-        확인하기
+
+  <!-- 검색 -->
+  <div class="box">
+
+    <h2>🔎 분실물·습득물 찾기</h2>
+
+    <div class="search-row">
+
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="예: 검은색 지갑"
+      >
+
+      <button onclick="loadPosts()">
+        검색
       </button>
-    </div>
 
-    <div class="card">
-      <h3>📦 습득물 확인</h3>
-      <p>학교에서 발견된 물건을 확인할 수 있습니다.</p>
-      <button onclick="alert('습득물 목록은 다음 단계에서 연결됩니다.')">
-        확인하기
-      </button>
-    </div>
-
-    <div class="card">
-      <h3>📝 분실물 제보</h3>
-      <p>로그인하지 않아도 제보할 수 있습니다.</p>
-      <button onclick="scrollToReport()">
-        제보하기
-      </button>
     </div>
 
   </div>
 
-  <div class="report-box" id="reportBox">
+
+  <!-- 공개 게시글 -->
+  <div class="box">
+
+    <h2>📋 공개된 분실물·습득물</h2>
+
+    <div id="postList">
+      <div class="empty">
+        게시글을 불러오는 중...
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- 제보 -->
+  <div class="box">
 
     <h2>📝 분실물·습득물 제보</h2>
 
-    <label for="postType">구분</label>
+    <p class="notice">
+      로그인하지 않아도 제보할 수 있습니다.
+      모든 제보는 관리자 확인 후 공개됩니다.
+    </p>
+
+    <label>구분</label>
+
     <select id="postType">
       <option value="lost">분실물</option>
       <option value="found">습득물</option>
     </select>
 
-    <label for="postTitle">제목</label>
+
+    <label>제목</label>
+
     <input
-      type="text"
       id="postTitle"
+      type="text"
       placeholder="예: 검은색 지갑을 잃어버렸어요"
     >
 
-    <label for="postContent">내용</label>
+
+    <label>내용</label>
+
     <textarea
       id="postContent"
       rows="6"
       placeholder="잃어버린 장소, 시간, 물건의 특징 등을 적어주세요."
     ></textarea>
 
-    <button onclick="submitPost()">제보하기</button>
+
+    <label>사진</label>
+
+    <input
+      id="postImage"
+      type="file"
+      accept="image/*"
+    >
 
     <p class="notice">
-      ※ 제보 내용은 관리자 확인 후 사이트에 공개됩니다.
+      사진은 1장만 첨부할 수 있습니다.
     </p>
+
+
+    <button onclick="submitPost()">
+      제보하기
+    </button>
 
   </div>
 
-  <div class="login-box">
 
-    <h3>🔐 관리자 로그인</h3>
+  <!-- 로그인 -->
+  <div class="box">
+
+    <h2>🔐 관리자 로그인</h2>
 
     <div id="loginForm">
 
       <input
-        type="email"
         id="email"
+        type="email"
         placeholder="이메일"
       >
 
       <input
-        type="password"
         id="password"
+        type="password"
         placeholder="비밀번호"
       >
 
-      <button onclick="login()">로그인</button>
+      <button onclick="login()">
+        로그인
+      </button>
 
     </div>
 
-    <div id="userInfo"></div>
+    <div
+      id="userInfo"
+      class="user-info hidden"
+    ></div>
+
+  </div>
+
+
+  <!-- 관리자 -->
+  <div
+    id="adminPanel"
+    class="box hidden"
+  >
+
+    <h2>🛡️ 관리자 관리 페이지</h2>
+
+    <p class="notice">
+      관리자만 볼 수 있는 페이지입니다.
+    </p>
+
+    <button onclick="loadAdminPosts()">
+      승인 대기 제보 새로고침
+    </button>
+
+    <div id="adminList">
+      <div class="empty">
+        불러오는 중...
+      </div>
+    </div>
 
   </div>
 
 </div>
 
+
 <script>
+
+  /* =========================
+     Supabase 연결
+  ========================= */
 
   const SUPABASE_URL =
     "https://wxrkhzwnfyvspfpwaowl.supabase.co";
@@ -263,17 +433,10 @@
     );
 
 
-  // 제보 영역으로 이동
-  function scrollToReport() {
-    document
-      .getElementById("reportBox")
-      .scrollIntoView({
-        behavior: "smooth"
-      });
-  }
+  /* =========================
+     로그인
+  ========================= */
 
-
-  // 로그인
   async function login() {
 
     const email =
@@ -282,51 +445,60 @@
     const password =
       document.getElementById("password").value;
 
+
     if (!email || !password) {
       alert("이메일과 비밀번호를 입력해주세요.");
       return;
     }
 
+
     const { error } =
       await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
+        email,
+        password
       });
+
 
     if (error) {
       alert("로그인에 실패했습니다.\n" + error.message);
       return;
     }
 
-    alert("로그인되었습니다!");
 
-    updateLoginState();
+    alert("로그인되었습니다.");
+
+    await updateLoginState();
   }
 
 
-  // 로그아웃
+  /* =========================
+     로그아웃
+  ========================= */
+
   async function logout() {
 
-    const { error } =
-      await supabaseClient.auth.signOut();
+    await supabaseClient.auth.signOut();
 
-    if (error) {
-      alert("로그아웃에 실패했습니다.");
-      return;
-    }
+    document
+      .getElementById("adminPanel")
+      .classList.add("hidden");
+
+    await updateLoginState();
 
     alert("로그아웃되었습니다.");
-
-    updateLoginState();
   }
 
 
-  // 로그인 상태 확인
+  /* =========================
+     로그인 상태
+  ========================= */
+
   async function updateLoginState() {
 
     const {
       data: { user }
     } = await supabaseClient.auth.getUser();
+
 
     const loginForm =
       document.getElementById("loginForm");
@@ -337,34 +509,44 @@
     const logoutBtn =
       document.getElementById("logoutBtn");
 
+    const adminPanel =
+      document.getElementById("adminPanel");
 
-    if (user) {
 
-      loginForm.classList.add("hidden");
-
-      logoutBtn.classList.remove("hidden");
-
-      userInfo.style.display = "block";
-
-      userInfo.innerHTML =
-        "로그인 계정<br><strong>" +
-        user.email +
-        "</strong>";
-
-      checkAdmin(user.id);
-
-    } else {
+    if (!user) {
 
       loginForm.classList.remove("hidden");
 
+      userInfo.classList.add("hidden");
+
       logoutBtn.classList.add("hidden");
 
-      userInfo.style.display = "none";
+      adminPanel.classList.add("hidden");
+
+      return;
     }
+
+
+    loginForm.classList.add("hidden");
+
+    logoutBtn.classList.remove("hidden");
+
+    userInfo.classList.remove("hidden");
+
+    userInfo.innerHTML =
+      "로그인 계정: <strong>" +
+      user.email +
+      "</strong>";
+
+
+    await checkAdmin(user.id);
   }
 
 
-  // 관리자 확인
+  /* =========================
+     관리자 확인
+  ========================= */
+
   async function checkAdmin(userId) {
 
     const { data, error } =
@@ -374,23 +556,102 @@
         .eq("user_id", userId)
         .maybeSingle();
 
-    if (!error && data && data.role === "admin") {
 
-      const userInfo =
-        document.getElementById("userInfo");
+    const adminPanel =
+      document.getElementById("adminPanel");
+
+    const userInfo =
+      document.getElementById("userInfo");
+
+
+    if (
+      !error &&
+      data &&
+      data.role === "admin"
+    ) {
 
       userInfo.innerHTML +=
-        "<br><strong>관리자 계정</strong>";
+        "<br><strong>🛡️ 관리자</strong>";
+
+      adminPanel.classList.remove("hidden");
+
+      await loadAdminPosts();
+
+    } else {
+
+      adminPanel.classList.add("hidden");
     }
   }
 
 
-  // 제보 저장
-  async function submitPost() {
+  /* =========================
+     사진 업로드
+  ========================= */
 
-    const {
-      data: { user }
-    } = await supabaseClient.auth.getUser();
+  async function uploadImage(file) {
+
+    if (!file) {
+      return null;
+    }
+
+
+    if (!file.type.startsWith("image/")) {
+      throw new Error("이미지 파일만 업로드할 수 있습니다.");
+    }
+
+
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error("사진은 5MB 이하만 업로드할 수 있습니다.");
+    }
+
+
+    const extension =
+      file.name.split(".").pop().toLowerCase();
+
+
+    const fileName =
+      Date.now() +
+      "-" +
+      Math.random().toString(36).substring(2) +
+      "." +
+      extension;
+
+
+    const { error } =
+      await supabaseClient
+        .storage
+        .from("lost-found-images")
+        .upload(
+          fileName,
+          file,
+          {
+            contentType: file.type,
+            upsert: false
+          }
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    const { data } =
+      supabaseClient
+        .storage
+        .from("lost-found-images")
+        .getPublicUrl(fileName);
+
+
+    return data.publicUrl;
+  }
+
+
+  /* =========================
+     제보하기
+  ========================= */
+
+  async function submitPost() {
 
     const type =
       document.getElementById("postType").value;
@@ -401,6 +662,9 @@
     const content =
       document.getElementById("postContent").value.trim();
 
+    const file =
+      document.getElementById("postImage").files[0];
+
 
     if (!title || !content) {
 
@@ -410,24 +674,327 @@
     }
 
 
-    const { error } =
+    try {
+
+      const {
+        data: { user }
+      } = await supabaseClient.auth.getUser();
+
+
+      let imageUrl = null;
+
+
+      if (file) {
+
+        imageUrl =
+          await uploadImage(file);
+      }
+
+
+      const { error } =
+        await supabaseClient
+          .from("posts")
+          .insert({
+            type,
+            title,
+            content,
+            author_id: user ? user.id : null,
+            image_url: imageUrl,
+            status: "pending"
+          });
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      document.getElementById("postTitle").value = "";
+      document.getElementById("postContent").value = "";
+      document.getElementById("postImage").value = "";
+
+
+      alert(
+        "제보가 접수되었습니다.\n\n" +
+        "관리자 확인 후 공개됩니다."
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "제보에 실패했습니다.\n\n" +
+        error.message
+      );
+    }
+  }
+
+
+  /* =========================
+     공개 게시글 불러오기
+  ========================= */
+
+  async function loadPosts() {
+
+    const postList =
+      document.getElementById("postList");
+
+    const keyword =
+      document
+        .getElementById("searchInput")
+        .value
+        .trim();
+
+
+    let query =
+      supabaseClient
+        .from("posts")
+        .select("*")
+        .eq("status", "approved")
+        .order("created_at", {
+          ascending: false
+        });
+
+
+    if (keyword) {
+
+      query =
+        query.or(
+          "title.ilike.%" +
+          keyword +
+          "%,content.ilike.%" +
+          keyword +
+          "%"
+        );
+    }
+
+
+    const { data, error } =
+      await query;
+
+
+    if (error) {
+
+      postList.innerHTML =
+        "<p>게시글을 불러오지 못했습니다.</p>";
+
+      console.error(error);
+
+      return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+      postList.innerHTML =
+        "<div class='empty'>등록된 게시글이 없습니다.</div>";
+
+      return;
+    }
+
+
+    postList.innerHTML =
+      data.map(post => renderPost(post)).join("");
+  }
+
+
+  /* =========================
+     게시글 화면
+  ========================= */
+
+  function renderPost(post) {
+
+    const typeText =
+      post.type === "lost"
+        ? "분실물"
+        : "습득물";
+
+
+    const image =
+      post.image_url
+        ? `
+          <img
+            src="${escapeHtml(post.image_url)}"
+            alt="첨부 사진"
+          >
+        `
+        : "";
+
+
+    return `
+      <div class="post">
+
+        <span class="badge ${post.type}">
+          ${typeText}
+        </span>
+
+        <h3>
+          ${escapeHtml(post.title)}
+        </h3>
+
+        <p>
+          ${escapeHtml(post.content)}
+        </p>
+
+        ${image}
+
+      </div>
+    `;
+  }
+
+
+  /* =========================
+     관리자 글 불러오기
+  ========================= */
+
+  async function loadAdminPosts() {
+
+    const adminList =
+      document.getElementById("adminList");
+
+
+    const { data, error } =
       await supabaseClient
         .from("posts")
-        .insert({
-          type: type,
-          title: title,
-          content: content,
-          author_id: user ? user.id : null,
-          status: "pending"
+        .select("*")
+        .eq("status", "pending")
+        .order("created_at", {
+          ascending: true
         });
 
 
     if (error) {
 
+      adminList.innerHTML =
+        "<p>관리자 글을 불러오지 못했습니다.</p>";
+
       console.error(error);
 
+      return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+      adminList.innerHTML =
+        "<div class='empty'>승인 대기 중인 제보가 없습니다.</div>";
+
+      return;
+    }
+
+
+    adminList.innerHTML =
+      data
+        .map(post => renderAdminPost(post))
+        .join("");
+  }
+
+
+  /* =========================
+     관리자 게시글 화면
+  ========================= */
+
+  function renderAdminPost(post) {
+
+    const typeText =
+      post.type === "lost"
+        ? "분실물"
+        : "습득물";
+
+
+    const image =
+      post.image_url
+        ? `
+          <img
+            src="${escapeHtml(post.image_url)}"
+            alt="첨부 사진"
+          >
+        `
+        : "";
+
+
+    return `
+      <div class="post">
+
+        <span class="badge pending">
+          승인 대기
+        </span>
+
+        <span class="badge ${post.type}">
+          ${typeText}
+        </span>
+
+        <h3>
+          ${escapeHtml(post.title)}
+        </h3>
+
+        <p>
+          ${escapeHtml(post.content)}
+        </p>
+
+        ${image}
+
+        <div class="admin-actions">
+
+          <button
+            class="approve"
+            onclick="changeStatus(${post.id}, 'approved')"
+          >
+            ✅ 승인
+          </button>
+
+          <button
+            class="reject"
+            onclick="changeStatus(${post.id}, 'rejected')"
+          >
+            ❌ 거절
+          </button>
+
+          <button
+            class="secondary"
+            onclick="deletePost(${post.id})"
+          >
+            🗑️ 삭제
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  }
+
+
+  /* =========================
+     승인 / 거절
+  ========================= */
+
+  async function changeStatus(id, status) {
+
+    const message =
+      status === "approved"
+        ? "이 제보를 승인할까요?"
+        : "이 제보를 거절할까요?";
+
+
+    if (!confirm(message)) {
+      return;
+    }
+
+
+    const { error } =
+      await supabaseClient
+        .from("posts")
+        .update({
+          status
+        })
+        .eq("id", id);
+
+
+    if (error) {
+
       alert(
-        "제보에 실패했습니다.\n" +
+        "처리하지 못했습니다.\n" +
         error.message
       );
 
@@ -435,23 +1002,83 @@
     }
 
 
-    document.getElementById("postTitle").value = "";
-    document.getElementById("postContent").value = "";
-
-
     alert(
-      "제보가 접수되었습니다!\n\n" +
-      "관리자 확인 후 게시됩니다."
+      status === "approved"
+        ? "승인되었습니다."
+        : "거절되었습니다."
     );
+
+
+    await loadAdminPosts();
+    await loadPosts();
   }
 
 
+  /* =========================
+     삭제
+  ========================= */
+
+  async function deletePost(id) {
+
+    if (!confirm("이 제보를 삭제할까요?")) {
+      return;
+    }
+
+
+    const { error } =
+      await supabaseClient
+        .from("posts")
+        .delete()
+        .eq("id", id);
+
+
+    if (error) {
+
+      alert(
+        "삭제하지 못했습니다.\n" +
+        error.message
+      );
+
+      return;
+    }
+
+
+    alert("삭제되었습니다.");
+
+    await loadAdminPosts();
+    await loadPosts();
+  }
+
+
+  /* =========================
+     HTML 안전 처리
+  ========================= */
+
+  function escapeHtml(value) {
+
+    if (!value) {
+      return "";
+    }
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+
+  /* =========================
+     시작
+  ========================= */
+
   document
     .getElementById("logoutBtn")
-    .addEventListener("click", logout);
-
-
-  updateLoginState();
+    .addEventListener(
+      "click",
+      logout
+    );
 
 
   supabaseClient.auth.onAuthStateChange(
@@ -459,6 +1086,10 @@
       updateLoginState();
     }
   );
+
+
+  updateLoginState();
+  loadPosts();
 
 </script>
 
