@@ -21,7 +21,7 @@
 
     header {
       background: white;
-      padding: 20px;
+      padding: 18px 20px;
       border-bottom: 1px solid #ddd;
       display: flex;
       justify-content: space-between;
@@ -30,12 +30,12 @@
 
     header h1 {
       margin: 0;
-      font-size: 22px;
+      font-size: 21px;
     }
 
     .container {
       max-width: 900px;
-      margin: 40px auto;
+      margin: 35px auto;
       padding: 20px;
     }
 
@@ -49,7 +49,7 @@
 
     .hero h2 {
       font-size: 30px;
-      margin-bottom: 10px;
+      margin: 0 0 12px;
     }
 
     .hero p {
@@ -85,7 +85,8 @@
       opacity: 0.85;
     }
 
-    .login-box {
+    .login-box,
+    .report-box {
       background: white;
       padding: 25px;
       border-radius: 15px;
@@ -93,13 +94,26 @@
       border: 1px solid #eee;
     }
 
-    input {
+    input,
+    select,
+    textarea {
       width: 100%;
       padding: 12px;
       margin: 7px 0;
       border: 1px solid #ddd;
       border-radius: 8px;
       font-size: 14px;
+      font-family: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
     }
 
     #userInfo {
@@ -114,39 +128,21 @@
       display: none;
     }
 
+    .notice {
+      color: #666;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
     @media (max-width: 700px) {
       .cards {
         grid-template-columns: 1fr;
       }
+
+      .hero h2 {
+        font-size: 25px;
+      }
     }
-    .report-box {
-  background: white;
-  padding: 25px;
-  border-radius: 15px;
-  margin-top: 25px;
-  border: 1px solid #eee;
-}
-
-.report-box label {
-  display: block;
-  margin-top: 15px;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.report-box select,
-.report-box textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-}
-
-.report-box textarea {
-  resize: vertical;
-}
   </style>
 </head>
 
@@ -158,33 +154,7 @@
 </header>
 
 <div class="container">
-<div class="report-box">
-  <h2>📝 분실물 제보</h2>
 
-  <label>구분</label>
-  <select id="postType">
-    <option value="lost">분실물</option>
-    <option value="found">습득물</option>
-  </select>
-
-  <label>제목</label>
-  <input
-    type="text"
-    id="postTitle"
-    placeholder="예: 검은색 지갑을 잃어버렸어요"
-  >
-
-  <label>내용</label>
-  <textarea
-    id="postContent"
-    placeholder="잃어버린 장소, 시간, 물건의 특징 등을 적어주세요."
-    rows="6"
-  ></textarea>
-
-  <button onclick="submitPost()">제보하기</button>
-
-  <p id="postMessage"></p>
-</div>
   <div class="hero">
     <h2>잃어버린 물건,<br>여기서 찾아보세요.</h2>
     <p>진영고 학생들을 위한 분실물·습득물 알림 사이트입니다.</p>
@@ -210,19 +180,52 @@
 
     <div class="card">
       <h3>📝 분실물 제보</h3>
-      <p>잃어버린 물건이나 발견한 물건을 제보합니다.</p>
-      <button onclick="checkLogin()">
+      <p>로그인하지 않아도 제보할 수 있습니다.</p>
+      <button onclick="scrollToReport()">
         제보하기
       </button>
     </div>
 
   </div>
 
+  <div class="report-box" id="reportBox">
+
+    <h2>📝 분실물·습득물 제보</h2>
+
+    <label for="postType">구분</label>
+    <select id="postType">
+      <option value="lost">분실물</option>
+      <option value="found">습득물</option>
+    </select>
+
+    <label for="postTitle">제목</label>
+    <input
+      type="text"
+      id="postTitle"
+      placeholder="예: 검은색 지갑을 잃어버렸어요"
+    >
+
+    <label for="postContent">내용</label>
+    <textarea
+      id="postContent"
+      rows="6"
+      placeholder="잃어버린 장소, 시간, 물건의 특징 등을 적어주세요."
+    ></textarea>
+
+    <button onclick="submitPost()">제보하기</button>
+
+    <p class="notice">
+      ※ 제보 내용은 관리자 확인 후 사이트에 공개됩니다.
+    </p>
+
+  </div>
+
   <div class="login-box">
 
-    <h3>로그인</h3>
+    <h3>🔐 관리자 로그인</h3>
 
     <div id="loginForm">
+
       <input
         type="email"
         id="email"
@@ -236,6 +239,7 @@
       >
 
       <button onclick="login()">로그인</button>
+
     </div>
 
     <div id="userInfo"></div>
@@ -246,8 +250,8 @@
 
 <script>
 
-  // Supabase 연결
-  const SUPABASE_URL = "https://wxrkhzwnfyvspfpwaowl.supabase.co";
+  const SUPABASE_URL =
+    "https://wxrkhzwnfyvspfpwaowl.supabase.co";
 
   const SUPABASE_KEY =
     "sb_publishable_jTiQ2IUkhmyq50YBzWqu1w_79l5IWno";
@@ -257,6 +261,16 @@
       SUPABASE_URL,
       SUPABASE_KEY
     );
+
+
+  // 제보 영역으로 이동
+  function scrollToReport() {
+    document
+      .getElementById("reportBox")
+      .scrollIntoView({
+        behavior: "smooth"
+      });
+  }
 
 
   // 로그인
@@ -273,7 +287,7 @@
       return;
     }
 
-    const { data, error } =
+    const { error } =
       await supabaseClient.auth.signInWithPassword({
         email: email,
         password: password
@@ -287,7 +301,6 @@
     alert("로그인되었습니다!");
 
     updateLoginState();
-
   }
 
 
@@ -305,7 +318,6 @@
     alert("로그아웃되었습니다.");
 
     updateLoginState();
-
   }
 
 
@@ -335,7 +347,7 @@
       userInfo.style.display = "block";
 
       userInfo.innerHTML =
-        "현재 로그인한 계정<br><strong>" +
+        "로그인 계정<br><strong>" +
         user.email +
         "</strong>";
 
@@ -348,9 +360,7 @@
       logoutBtn.classList.add("hidden");
 
       userInfo.style.display = "none";
-
     }
-
   }
 
 
@@ -371,89 +381,85 @@
 
       userInfo.innerHTML +=
         "<br><strong>관리자 계정</strong>";
-
     }
-
   }
 
 
-  // 제보 버튼
-  async function checkLogin() {
+  // 제보 저장
+  async function submitPost() {
 
     const {
       data: { user }
     } = await supabaseClient.auth.getUser();
 
-   author_id: user ? user.id : null,
+    const type =
+      document.getElementById("postType").value;
+
+    const title =
+      document.getElementById("postTitle").value.trim();
+
+    const content =
+      document.getElementById("postContent").value.trim();
+
+
+    if (!title || !content) {
+
+      alert("제목과 내용을 모두 입력해주세요.");
+
+      return;
+    }
+
+
+    const { error } =
+      await supabaseClient
+        .from("posts")
+        .insert({
+          type: type,
+          title: title,
+          content: content,
+          author_id: user ? user.id : null,
+          status: "pending"
+        });
+
+
+    if (error) {
+
+      console.error(error);
+
+      alert(
+        "제보에 실패했습니다.\n" +
+        error.message
+      );
+
+      return;
+    }
+
+
+    document.getElementById("postTitle").value = "";
+    document.getElementById("postContent").value = "";
+
 
     alert(
-      "로그인 확인 완료!\n분실물 제보 기능은 다음 단계에서 연결됩니다."
+      "제보가 접수되었습니다!\n\n" +
+      "관리자 확인 후 게시됩니다."
     );
-
   }
 
 
-  // 로그아웃 버튼
   document
     .getElementById("logoutBtn")
     .addEventListener("click", logout);
 
 
-  // 페이지 처음 열었을 때 로그인 상태 확인
   updateLoginState();
 
 
-  // 로그인 상태 변화 감지
   supabaseClient.auth.onAuthStateChange(
     () => {
       updateLoginState();
     }
   );
-async function submitPost() {
 
-  const {
-    data: { user }
-  } = await supabaseClient.auth.getUser();
-
-
-  const type =
-    document.getElementById("postType").value;
-
-  const title =
-    document.getElementById("postTitle").value.trim();
-
-  const content =
-    document.getElementById("postContent").value.trim();
-
-  if (!title || !content) {
-    alert("제목과 내용을 모두 입력해주세요.");
-    return;
-  }
-
-  const { error } =
-    await supabaseClient
-      .from("posts")
-      .insert({
-        type: type,
-        title: title,
-        content: content,
-        author_id: user.id,
-        status: "pending"
-      });
-
-  if (error) {
-    console.error(error);
-    alert("제보에 실패했습니다.\n" + error.message);
-    return;
-  }
-
-  document.getElementById("postTitle").value = "";
-  document.getElementById("postContent").value = "";
-
-  alert(
-    "제보가 접수되었습니다!\n관리자 확인 후 게시됩니다."
-  );
-}
 </script>
 
 </body>
