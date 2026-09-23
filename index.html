@@ -977,7 +977,11 @@
       return;
     }
 
-
+if (postError) {
+  console.error("posts 저장 오류:", postError);
+  alert("제보에 실패했습니다.\n\n" + postError.message);
+  return;
+}
     try {
 
       const {
