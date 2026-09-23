@@ -119,6 +119,34 @@
         grid-template-columns: 1fr;
       }
     }
+    .report-box {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  margin-top: 25px;
+  border: 1px solid #eee;
+}
+
+.report-box label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.report-box select,
+.report-box textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.report-box textarea {
+  resize: vertical;
+}
   </style>
 </head>
 
@@ -130,7 +158,33 @@
 </header>
 
 <div class="container">
+<div class="report-box">
+  <h2>📝 분실물 제보</h2>
 
+  <label>구분</label>
+  <select id="postType">
+    <option value="lost">분실물</option>
+    <option value="found">습득물</option>
+  </select>
+
+  <label>제목</label>
+  <input
+    type="text"
+    id="postTitle"
+    placeholder="예: 검은색 지갑을 잃어버렸어요"
+  >
+
+  <label>내용</label>
+  <textarea
+    id="postContent"
+    placeholder="잃어버린 장소, 시간, 물건의 특징 등을 적어주세요."
+    rows="6"
+  ></textarea>
+
+  <button onclick="submitPost()">제보하기</button>
+
+  <p id="postMessage"></p>
+</div>
   <div class="hero">
     <h2>잃어버린 물건,<br>여기서 찾아보세요.</h2>
     <p>진영고 학생들을 위한 분실물·습득물 알림 사이트입니다.</p>
