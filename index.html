@@ -415,7 +415,55 @@
       updateLoginState();
     }
   );
+async function submitPost() {
 
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    alert("제보하려면 먼저 로그인해주세요.");
+    return;
+  }
+
+  const type =
+    document.getElementById("postType").value;
+
+  const title =
+    document.getElementById("postTitle").value.trim();
+
+  const content =
+    document.getElementById("postContent").value.trim();
+
+  if (!title || !content) {
+    alert("제목과 내용을 모두 입력해주세요.");
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("posts")
+      .insert({
+        type: type,
+        title: title,
+        content: content,
+        author_id: user.id,
+        status: "pending"
+      });
+
+  if (error) {
+    console.error(error);
+    alert("제보에 실패했습니다.\n" + error.message);
+    return;
+  }
+
+  document.getElementById("postTitle").value = "";
+  document.getElementById("postContent").value = "";
+
+  alert(
+    "제보가 접수되었습니다!\n관리자 확인 후 게시됩니다."
+  );
+}
 </script>
 
 </body>
